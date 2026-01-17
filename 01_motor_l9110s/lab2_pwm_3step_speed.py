@@ -1,8 +1,8 @@
 from machine import Pin, PWM
 import time
 
-IA = PWM(Pin(25), freq=20000)
-IB = PWM(Pin(26), freq=20000)
+IA = PWM(Pin(2), freq=20000)
+IB = PWM(Pin(4), freq=20000)
 
 def stop():
     IA.duty(0); IB.duty(0)
