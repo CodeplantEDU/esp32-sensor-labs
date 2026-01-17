@@ -70,7 +70,7 @@ PWM으로 **속도(세기)**를 조절할 수 있다.
 ```python
 from machine import Pin, PWM
 import time
-### (1) 모듈(도구) 불러오기
+
 (2) PWM 출력 핀 설정
 GPIO25 → A-IA, GPIO26 → A-IB
 
