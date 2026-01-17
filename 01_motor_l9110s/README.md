@@ -40,14 +40,14 @@ ESP32가 L9110S에 신호를 줘서 모터를 **정방향 → 정지 → 역방�
 ---
 
 ### (1) 모듈(도구) 불러오기
-- `Pin` : ESP32의 핀(전기 신호 출력) 제어
-- `PWM` : 속도 조절용 PWM 신호 생성
+- `Pin` : ESP32의 핀(전기 신호 출력) 제어  
+- `PWM` : 속도 조절용 PWM 신호 생성  
 - `time.sleep()` : 동작 사이에 기다리기(초 단위)
 
 ```python
 from machine import Pin, PWM
 import time
-### (2) PWM 출력 핀 설정
+(2) PWM 출력 핀 설정
 GPIO25 → A-IA, GPIO26 → A-IB
 
 freq=20000 (20kHz) : 모터에서 나는 ‘삐—’ 소리를 줄이기 좋은 주파수
