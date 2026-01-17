@@ -2,8 +2,8 @@ from machine import Pin, PWM
 import time
 
 # [설정]
-IA = PWM(Pin(25), freq=20000)  # A-IA
-IB = PWM(Pin(26), freq=20000)  # A-IB
+IA = PWM(Pin(2), freq=20000)  # A-IA
+IB = PWM(Pin(4), freq=20000)  # A-IB
 
 # [핵심 함수 3개]
 def stop():
