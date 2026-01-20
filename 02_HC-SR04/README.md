@@ -1,10 +1,10 @@
-# 초음파 센서(HC-SR04) - 실습 1, 실습 2, 실습 3 (ESP32 + MicroPython/Thonny)
+# 초음파 센서(HC-SR04) - (ESP32 + MicroPython/Thonny)
 
 ESP32 + HC-SR04로 **거리(cm)**를 측정하고, 거리값으로 **LED/알림** 같은 간단한 제어까지 빠르게 체험하는 실습 세트입니다.
 
 ---
 
-## 0) 한 줄 목표
+## 실습 목표
 - **TRIG(GPIO26)** 로 초음파를 쏘고, **ECHO(GPIO25)** 펄스 길이를 읽어 **거리(cm)**로 바꾼다.
 
 ---
@@ -17,7 +17,7 @@ ESP32 + HC-SR04로 **거리(cm)**를 측정하고, 거리값으로 **LED/알림*
 - (선택) 부저(피에조)
 
 > **중요(보호):** HC-SR04의 **ECHO는 보통 5V**로 나옵니다. ESP32는 3.3V 입력이므로  
-> **ECHO → ESP32(GPIO25)** 는 **분압(저항 2개) 또는 레벨시프터**를 강력 권장합니다.
+> **ECHO → ESP32(GPIO25)** 는 **분압(저항 2개) 또는 레벨시프터**를 사용하시면 더 안전합니다.
 
 ---
 
@@ -37,18 +37,6 @@ ESP32 + HC-SR04로 **거리(cm)**를 측정하고, 거리값으로 **LED/알림*
 - **HC-SR04 ECHO → (1kΩ) → ESP32 GPIO25**
 - **ESP32 GPIO25 → (2kΩ) → GND**  
   → 5V가 약 3.3V로 내려갑니다(간단/저렴/수업용으로 충분).
-
----
-
-## 3) 폴더/파일 구조(추천)
-```
-02_HC-SR04/
- ├─ README.md
- └─ code/
-     ├─ lab1_distance_print.py
-     ├─ lab2_distance_led_threshold.py
-     └─ lab3_distance_filter_avg.py
-```
 
 ---
 
