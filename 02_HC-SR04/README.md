@@ -42,7 +42,7 @@ ESP32 + HC-SR04로 **거리(cm)**를 측정하고, 거리값으로 **LED/알림*
 
 ## 3) 폴더/파일 구조(추천)
 ```
-02_ultrasonic_hcsr04/
+02_HC-SR04/
  ├─ README.md
  └─ code/
      ├─ lab1_distance_print.py
