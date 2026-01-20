@@ -1,0 +1,29 @@
+from machine import Pin, time_pulse_us
+import time
+
+TRIG = Pin(26, Pin.OUT)
+ECHO = Pin(25, Pin.IN)
+
+LED = Pin(2, Pin.OUT)     # 원하는 핀으로 변경 가능
+THRESH = 15.0             # cm
+
+def read_cm(timeout_us=30000):
+    TRIG.value(0); time.sleep_us(2)
+    TRIG.value(1); time.sleep_us(10)
+    TRIG.value(0)
+    us = time_pulse_us(ECHO, 1, timeout_us)
+    if us < 0:
+        return None
+    return us / 58.0
+
+print("[실습2] 임계값 LED ({}cm 이하면 ON)".format(THRESH))
+while True:
+    d = read_cm()
+    if d is None:
+        LED.value(0)
+        print("timeout")
+    else:
+        near = (d < THRESH)
+        LED.value(1 if near else 0)
+        print("{:.1f} cm  |  LED {}".format(d, "ON" if near else "OFF"))
+    time.sleep(0.1)
