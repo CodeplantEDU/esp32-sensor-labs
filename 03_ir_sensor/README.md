@@ -1,4 +1,4 @@
-# IR 반사형 센서(3핀: SIG/VCC/GND) - ESP32 실습 (SIG = GPIO26)
+# IR 센서 - (ESP32 + MicroPython/Thonny)
 
 ESP32 + 3핀 IR 반사형 센서 모듈(**SIG / VCC / GND**)을 이용해 **바닥 반사량**을 읽고, 임계값(threshold)으로 **검정 라인(테이프) 감지**까지 진행합니다.
 
