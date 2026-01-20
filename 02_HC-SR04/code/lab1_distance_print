@@ -1,0 +1,30 @@
+from machine import Pin, time_pulse_us
+import time
+
+TRIG = Pin(26, Pin.OUT)
+ECHO = Pin(25, Pin.IN)
+
+def read_cm(timeout_us=30000):
+    # TRIG 10us 펄스
+    TRIG.value(0)
+    time.sleep_us(2)
+    TRIG.value(1)
+    time.sleep_us(10)
+    TRIG.value(0)
+
+    # ECHO가 HIGH인 시간(마이크로초) 측정
+    us = time_pulse_us(ECHO, 1, timeout_us)  # 1: HIGH 펄스
+    if us < 0:
+        return None  # timeout 등
+
+    # 거리(cm) 근사식 (HC-SR04에서 자주 사용)
+    return us / 58.0
+
+print("[실습1] 거리 출력(cm)")
+while True:
+    d = read_cm()
+    if d is None:
+        print("timeout")
+    else:
+        print("{:.1f} cm".format(d))
+    time.sleep(0.2)
