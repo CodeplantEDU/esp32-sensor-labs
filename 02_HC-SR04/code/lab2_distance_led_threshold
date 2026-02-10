@@ -4,7 +4,7 @@ import time
 TRIG = Pin(26, Pin.OUT)
 ECHO = Pin(25, Pin.IN)
 
-LED = Pin(2, Pin.OUT)     # 원하는 핀으로 변경 가능
+LED = Pin(15, Pin.OUT)     # 원하는 핀으로 변경 가능
 THRESH = 15.0             # cm
 
 def read_cm(timeout_us=30000):
