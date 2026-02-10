@@ -1,3 +1,6 @@
+# [실습1] IR 센서 디지털 값 읽기
+# 배선: AO -> GPIO26, VCC -> 3V3, GND -> GND
+
 from machine import Pin
 import time
 
