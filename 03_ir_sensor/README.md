@@ -63,196 +63,38 @@ IR 센서의 출력(SIG)을 **ESP32 GPIO26**에서 읽어서,
 
 ---
 
-# 실습 1) IR 값 읽기 (ESP32)
+# 실습) IR 값 읽기 (ESP32)
 
 ## 1) 코드 전체 흐름(큰 그림)
-- ADC(아날로그 입력) 준비
 - `read_u16()` 또는 `read()`로 값 읽기
 - 시리얼(Thonny)에서 값 변화 관찰
 
 ## 2) 주요 코드
 > 파일: `lab1_ir_read_value_esp32.py`
 
-```python
-# [실습1] IR 센서 값 읽기 (ESP32 / MicroPython)
-# 배선: SIG->GPIO26, VCC->3V3, GND->GND
-
-from machine import Pin, ADC
+from machine import Pin
 import time
 
 IR_PIN = 26
-adc = ADC(Pin(IR_PIN))
+ir = Pin(IR_PIN, Pin.IN)
 
-# ESP32는 보통 ADC 범위 설정을 해주면 더 안정적입니다.
-# (MicroPython 버전에 따라 지원 여부가 다를 수 있음)
-try:
-    adc.atten(ADC.ATTN_11DB)   # 측정 범위 넓힘(대략 0~3.3V)
-    adc.width(ADC.WIDTH_12BIT) # 0~4095
-except:
-    pass
-
-print("[실습1] IR 값 읽기 시작")
+print("[실습1] IR 디지털 값 읽기 시작 (반전 출력)")
+print("출력 기준: 검은색=0, 흰색=1")
 
 while True:
-    try:
-        # 12bit일 때: 0~4095
-        val = adc.read()
-    except:
-        # read_u16() 지원이면: 0~65535
-        val = adc.read_u16()
-
-    print("IR =", val)
+    raw = ir.value()      # 원래 센서 출력 (검은색=1, 흰색=0)
+    print("IR =", raw)    # 값을 반대로 출력하고 싶다면 , val = 1- raw , print("IR =", val) 으로 추가/변경 해주세요!
     time.sleep(0.1)
-```
 
 ### 체크 포인트
 - 값이 계속 **0**이면: VCC/GND 배선, SIG 배선, 핀 번호(GPIO26)부터 확인
 - 값이 계속 **최대치에 가깝게 고정**이면: 센서가 너무 가까운 물체를 보고 있거나, SIG가 3.3V에 가까운 HIGH로 붙어있을 수 있음
 
----
-
-# 실습 2) 임계값으로 감지/미감지 만들기 (ESP32)
-
-## 1) 코드 전체 흐름(큰 그림)
-- 실습1에서 값의 범위를 관찰
-- 임계값(threshold)을 정함
-- threshold 이상이면 “감지됨”, 미만이면 “미감지” 출력
-
-## 2) 주요 코드
-> 파일: `lab2_ir_threshold_onoff_esp32.py`
-
-```python
-# [실습2] IR 센서 임계값 감지 (ESP32 / MicroPython)
-# 배선: SIG->GPIO26
-
-from machine import Pin, ADC
-import time
-
-IR_PIN = 26
-THRESHOLD = 2000  # <-- 실습1에서 본 값에 맞춰 조절
-
-adc = ADC(Pin(IR_PIN))
-try:
-    adc.atten(ADC.ATTN_11DB)
-    adc.width(ADC.WIDTH_12BIT)
-except:
-    pass
-
-print("[실습2] threshold =", THRESHOLD)
-
-while True:
-    val = adc.read()
-
-    if val >= THRESHOLD:
-        print("DETECTED  | IR=", val)
-    else:
-        print("NO OBJECT | IR=", val)
-
-    time.sleep(0.1)
-```
-
-### 체크 포인트
-- `THRESHOLD`는 **정답이 하나가 아니라** 환경(조명/거리/각도/바닥)에 따라 바뀝니다.
-- 수업에서는 보통:
-  - 손을 가까이/멀리 하면서 값을 보고
-  - 그 중간값을 임계값으로 잡게 하면 이해가 빠릅니다.
-
----
-
-# 실습 3) 오작동 줄이기 (필터링 + 히스테리시스)
-
-> 센서 값이 경계(threshold 근처)에서 흔들리면 출력이 **ON/OFF가 빠르게 깜빡**입니다.
-> 이걸 줄이려고 **(1) 평균 필터** + **(2) 히스테리시스(ON/OFF 임계값을 다르게)** 를 사용합니다.
-
-## 1) 코드 전체 흐름(큰 그림)
-- 최근 N개 값을 평균내서 흔들림 줄이기
-- ON 임계값 / OFF 임계값을 다르게 잡아서 깜빡임 줄이기
-
-## 2) 주요 코드
-> 파일: `lab3_ir_filter_hysteresis_esp32.py`
-
-```python
-# [실습3] 평균 필터 + 히스테리시스 (ESP32 / MicroPython)
-
-from machine import Pin, ADC
-import time
-
-IR_PIN = 26
-
-# 히스테리시스: ON은 높게, OFF는 낮게
-TH_ON  = 2200
-TH_OFF = 1800
-
-N = 10  # 평균낼 샘플 수(클수록 부드러움, 반응은 느려짐)
-
-adc = ADC(Pin(IR_PIN))
-try:
-    adc.atten(ADC.ATTN_11DB)
-    adc.width(ADC.WIDTH_12BIT)
-except:
-    pass
-
-buf = [0] * N
-idx = 0
-state = False  # False=미감지, True=감지
-
-print("[실습3] TH_ON=", TH_ON, "TH_OFF=", TH_OFF, "N=", N)
-
-while True:
-    v = adc.read()
-
-    buf[idx] = v
-    idx = (idx + 1) % N
-    avg = sum(buf) // N
-
-    # 상태 전이
-    if (not state) and (avg >= TH_ON):
-        state = True
-        print("--> DETECTED (avg=", avg, ")")
-
-    elif state and (avg <= TH_OFF):
-        state = False
-        print("--> NO OBJECT (avg=", avg, ")")
-
-    # 상태 출력
-    print("state=", "ON" if state else "OFF", " raw=", v, " avg=", avg)
-    time.sleep(0.05)
-```
-
----
-
-## 5) Arduino Nano 테스트 코드 (A0 읽기)
-> 센서가 아날로그처럼 변하는지 확인할 때 유용합니다.
-
-```cpp
-// arduino_ir_read_a0.ino
-// IR 센서 아날로그 값 측정 (Arduino Nano)
-// 배선: SIG->A0, VCC->5V, GND->GND
-
-const int IR_PIN = A0;
-
-void setup() {
-  Serial.begin(9600);
-}
-
-void loop() {
-  int raw = analogRead(IR_PIN);          // 0~1023
-  float volt = raw * (5.0 / 1023.0);     // Nano 5V 기준
-
-  Serial.print("RAW=");
-  Serial.print(raw);
-  Serial.print("  V=");
-  Serial.println(volt, 3);
-
-  delay(100);
-}
-```
-
----
 
 ## 6) 자주 막히는 곳(트러블슈팅)
 
 ### (1) 검은선인데도 값이 높게 나와요
+- 검은선 일 때 높은 값으로 출력되도록 내부 설정이 되어 있을 수 있습니다.
 - 센서 높이를 조금 올리거나(바닥에서 멀리)
 - 센서 각도를 바닥에 수직으로 맞추고
 - 주변(옆/앞)에 반사되는 물체(손/벽/테이블 가장자리)가 없는지 확인하세요.
