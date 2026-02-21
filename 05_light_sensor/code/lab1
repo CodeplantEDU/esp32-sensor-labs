@@ -1,1 +1,68 @@
 
+from machine import Pin, ADC, PWM
+import time
+
+# ===== 핀 설정 =====
+PIN_AO = 34     # 조도센서 아날로그 출력
+PIN_DO = 14     # 조도센서 디지털 출력
+PIN_LED = 25    # LED PWM
+
+adc = ADC(Pin(PIN_AO))
+adc.atten(ADC.ATTN_11DB)
+
+do = Pin(PIN_DO, Pin.IN)
+
+led = PWM(Pin(PIN_LED), freq=5000)
+
+# ===== 파라미터 =====
+ALPHA = 0.1       # 값 부드럽게 만드는 필터 강도
+GAMMA = 2.4       # 밝기 대비 강화
+INV_MIN = 3200    # 어두운 기준 (환경 맞게 조정)
+INV_MAX = 3800    # 밝은 기준 (환경 맞게 조정)
+
+def clamp(x, lo, hi):
+    return lo if x < lo else hi if x > hi else x
+
+def map01(x, x0, x1):
+    return (x - x0) / (x1 - x0) if x1 != x0 else 0
+
+print("=== 스마트폰 자동 밝기 모사 시작 ===")
+
+filtered = 4095 - adc.read()
+
+while True:
+    # ===== 1. 센서 읽기 =====
+    원본값 = adc.read()          # 어두울수록 값 큼
+    반전값 = 4095 - 원본값       # 밝을수록 값 큼
+    디지털상태 = do.value()
+
+    # ===== 2. 노이즈 제거 필터 =====
+    filtered = (1 - ALPHA) * filtered + ALPHA * 반전값
+
+    # ===== 3. 밝기 계산 =====
+    밝기비율 = map01(filtered, INV_MIN, INV_MAX)
+    밝기비율 = clamp(밝기비율, 0.0, 1.0)
+
+    # 대비 강화
+    밝기비율 = 밝기비율 ** GAMMA
+
+    # ===== 4. DO 핀 활용 =====
+    # 예시: 디지털 상태가 "어두움"이면 LED 완전 끄기
+    if 디지털상태 == 1:
+        duty = 0
+    else:
+        duty = int(밝기비율 * 65535)
+
+    led.duty_u16(duty)
+
+    # ===== 5. 보기 좋은 출력 =====
+    print(
+        f"밝기비율: {밝기비율*100:5.1f}% | "
+        f"원본ADC: {원본값:4d} | "
+        f"반전값: {반전값:4d} | "
+        f"필터값: {int(filtered):4d} | "
+        f"LED출력: {duty:5d} | "
+        f"디지털상태: {'밝음' if 디지털상태==0 else '어두움'}"
+    )
+
+    time.sleep(0.1)
