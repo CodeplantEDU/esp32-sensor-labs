@@ -151,8 +151,8 @@ RELAY_PIN = 27
 SERVO_PIN = 26
 
 # LOW 트리거 릴레이 기준
-RELAY_ON = 0
-RELAY_OFF = 1
+RELAY_ON = 1
+RELAY_OFF = 0
 
 # =========================
 # 릴레이 설정
