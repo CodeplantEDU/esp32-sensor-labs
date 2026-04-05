@@ -96,46 +96,34 @@
 ## 💻 7. 최종 실습 코드
 
 ```python
-from machine import Pin, ADC, PWM
+from machine import ADC, Pin
 import time
 
-PIN_AO = 34
-PIN_DO = 14
-PIN_LED = 25
+# 1. 핀 설정
+# ADC(Pin(34))를 통해 아날로그 입력 설정
+ldr = ADC(Pin(34))
+# ESP32 ADC는 기본적으로 0-1V만 읽으므로, 범위를 3.3V로 확장(ATTN_11DB)
+ldr.atten(ADC.ATTN_11DB)
 
-adc = ADC(Pin(PIN_AO))
-adc.atten(ADC.ATTN_11DB)
+# 제어할 LED 설정 (내장 LED는 보통 2번)
+led = Pin(2, Pin.OUT)
 
-do = Pin(PIN_DO, Pin.IN)
-led = PWM(Pin(PIN_LED), freq=5000)
-
-ALPHA = 0.1
-GAMMA = 2.4
-INV_MIN = 3200
-INV_MAX = 3800
-
-def clamp(x, lo, hi):
-    return lo if x < lo else hi if x > hi else x
-
-def map01(x, x0, x1):
-    return (x - x0) / (x1 - x0) if x1 != x0 else 0
-
-filtered = 4095 - adc.read()
+print("조도센서 실습을 시작합니다, 돼지님!")
 
 while True:
-    raw = adc.read()
-    inv = 4095 - raw
-    digital = do.value()
-
-    filtered = (1 - ALPHA) * filtered + ALPHA * inv
-
-    ratio = map01(filtered, INV_MIN, INV_MAX)
-    ratio = clamp(ratio, 0.0, 1.0)
-    ratio = ratio ** GAMMA
-
-    duty = 0 if digital == 1 else int(ratio * 65535)
-    led.duty_u16(duty)
-
-    print(f"밝기:{ratio*100:5.1f}% | ADC:{raw:4d} | LED:{duty:5d}")
-    time.sleep(0.1)
+    # 2. 센서 값 읽기 (범위: 0 ~ 4095)
+    light_value = ldr.read()
+    
+    # 3. 값 확인을 위한 출력
+    print(f"현재 밝기 값: {light_value}")
+    
+    # 4. LED 제어 로직
+    # 어두워지면(값이 커지면) LED를 켭니다. 
+    # 주변 환경에 따라 2000 숫자를 적절히 변경해 보세요.
+    if light_value > 2000:
+        led.value(1)  # LED ON
+    else:
+        led.value(0)  # LED OFF
+        
+    time.sleep(0.5)   # 0.5초 대기
 ```
