@@ -106,7 +106,7 @@ ldr = ADC(Pin(34))
 ldr.atten(ADC.ATTN_11DB)
 
 # 제어할 LED 설정 (내장 LED는 보통 2번)
-led = Pin(2, Pin.OUT)
+led = Pin(25, Pin.OUT)
 
 print("조도센서 실습을 시작합니다, 돼지님!")
 
