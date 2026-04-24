@@ -1215,7 +1215,7 @@ import ssd1306
 
 i2c = I2C(0, scl=Pin(22), sda=Pin(21), freq=400000)
 
-oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+oled = ssd1306.SSD1306_I2C(128, 16, i2c)
 
 oled.fill(0)                 # 화면 지우기
 oled.text("Hello OLED", 0, 0)
@@ -1251,7 +1251,7 @@ from machine import Pin, I2C
 import ssd1306
 
 i2c = I2C(0, scl=Pin(22), sda=Pin(21))
-oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+oled = ssd1306.SSD1306_I2C(128, 16, i2c)
 
 oled.fill(0)
 oled.rect(0, 0, 128, 64, 1)      # 테두리 사각형
@@ -1270,7 +1270,7 @@ import ssd1306
 import time
 
 i2c = I2C(0, scl=Pin(22), sda=Pin(21))
-oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+oled = ssd1306.SSD1306_I2C(128, 16, i2c)
 
 temperature = 24.5
 humidity = 58
