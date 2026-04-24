@@ -715,9 +715,9 @@ while True:
     lcd.putstr(str(count))
     count += 1
     time.sleep(1)
+```
+---
 
----
----
 
 # 1️⃣3️⃣ OLED 실습
 
