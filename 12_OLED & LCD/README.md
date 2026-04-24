@@ -933,7 +933,7 @@ class I2cLcd(LcdApi):
 ## 12-3. LCD 기본 출력 코드
 ```python
 from machine import Pin, I2C
-from i2c_lcd import I2cLcd
+from machine_i2c_lcd import I2cLcd
 import time
 
 # I2C 설정
@@ -982,7 +982,7 @@ I2C로 연결된 LCD를 초기화합니다.
 ## 12-5. 두 줄 출력 예제
 ```python
 from machine import Pin, I2C
-from i2c_lcd import I2cLcd
+from machine_i2c_lcd import I2cLcd
 
 i2c = I2C(0, scl=Pin(22), sda=Pin(21))
 lcd = I2cLcd(i2c, 0x27, 2, 16)
