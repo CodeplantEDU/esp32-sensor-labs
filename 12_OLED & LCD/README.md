@@ -583,15 +583,20 @@ LCD든 OLED든 먼저 주소를 확인하는 습관이 중요합니다.
 
 ## I2C 스캔 코드
 ```python
-from machine import Pin, I2C
+import machine
 
-i2c = I2C(0, scl=Pin(22), sda=Pin(21))
+# ESP32의 기본 I2C 핀 설정 (SDA=21, SCL=22)
+i2c = machine.I2C(0, scl=machine.Pin(22), sda=machine.Pin(21))
+
+print("I2C 스캐닝 시작...")
 devices = i2c.scan()
 
-print("I2C devices found:", devices)
+if len(devices) == 0:
+    print("연결된 I2C 장치가 없습니다. 선 연결을 확인하세요!")
+else:
+    for d in devices:
+        print("장치 찾음! 주소: ", hex(d))
 
-for addr in devices:
-    print("Decimal:", addr, " Hex:", hex(addr))
 ```
 
 ### 실행 결과 예시
